@@ -45,12 +45,13 @@ features = tf.Variable(feature_vectors, name='features')
 
 y = np.ones((num_of_samples,),dtype='int64')
 
-y[0:100]=0
-y[100:200]=1
-y[200:300]=2
-y[300:]=3
+y[0:]=0
+#y[100:200]=1
+#y[200:300]=2
+#y[300:]=3
 
-names = ['cats','dogs','horses','humans']
+#names = ['cats','dogs','horses','humans']
+names = ['noName']
 
 #with open(metadata, 'w') as metadata_file:
 #    for row in range(210):
