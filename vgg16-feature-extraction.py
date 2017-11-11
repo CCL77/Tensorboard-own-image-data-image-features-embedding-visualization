@@ -8,10 +8,13 @@ from keras.optimizers import SGD
 from sklearn.externals import joblib
 from keras import backend as K
 import keras
-    
-# File paths for the model, all of these except the CNN Weights are 
+from keras.applications.vgg16 import VGG16
+from keras.applications.vgg16 import preprocess_input
+from keras.preprocessing import image
+
+# File paths for the model, all of these except the CNN Weights are
 # provided in the repo, See the VGG_model/README.md to download VGG weights
-CNN_weights_file_name   = 'VGG_model/vgg16_weights.h5'
+CNN_weights_file_name = 'VGG_model/vgg16_weights.h5'
 
 
 # Chagne the value of verbose to 0 to avoid printing the progress statements
@@ -23,6 +26,7 @@ def get_image_model(CNN_weights_file_name):
     from VGG_model.VGG import VGG_16
     image_model = VGG_16(CNN_weights_file_name)
 
+
     # this is standard VGG 16 without the last two layers
     sgd = SGD(lr=0.1, decay=1e-6, momentum=0.9, nesterov=True)
     # one may experiment with "adam" optimizer, but the loss function for
@@ -31,6 +35,7 @@ def get_image_model(CNN_weights_file_name):
     return image_model
 
 vgg16_model = get_image_model(CNN_weights_file_name)
+#vgg16_model = VGG16(weights='imagenet', include_top=False)
 
 def get_image_features(image_file_name):
     ''' Runs the given image_file to VGG 16 model and returns the 
@@ -41,25 +46,26 @@ def get_image_features(image_file_name):
     # Since VGG was trained as a image of 224x224, every new image
     # is required to go through the same transformation
     im = cv2.resize(cv2.imread(image_file_name), (224, 224))
-
-
+    #im = image.load_img(image_file_name, target_size=(224, 224))
+    #im = image.img_to_array(im)
     # The mean pixel values are taken from the VGG authors, which are the values computed from the training dataset.
     mean_pixel = [103.939, 116.779, 123.68]
 
     im = im.astype(np.float32, copy=False) # shape of im = (224,224,3)
     
     for c in range(3):
-        im[:, :, c] = im[:, :, c] - mean_pixel[c]        
+       im[:, :, c] = im[:, :, c] - mean_pixel[c]
 
-    im = im.transpose((2,0,1)) # convert the image to RGBA  # shame of im= (3,224,224)
+    #im = im.transpose((2,0,1)) # convert the image to RGBA  # shame of im= (3,224,224)
 
     
     # this axis dimension is required becuase VGG was trained on a dimension
     # of 1, 3, 224, 224 (first axis is for the batch size
     # even though we are using only one image, we have to keep the dimensions consistent
     im = np.expand_dims(im, axis=0)  # shape of im = (1,3,224,224)
-
+    #im = preprocess_input(im)
     image_features[0,:] = vgg16_model.predict(im)[0]
+    #image_features = vgg16_model.predict(im)
     return image_features
 
 
@@ -68,13 +74,16 @@ data_path = PATH + '/data'
 data_dir_list = os.listdir(data_path)
 
 image_features_list=[]
+i = 1
 
 for dataset in data_dir_list:
     img_list=os.listdir(data_path+'/'+ dataset)
     print ('Extracting Features of dataset-'+'{}\n'.format(dataset))
     for img in img_list:
-        image_features=get_image_features(data_path + '/'+ dataset + '/'+ img )
-        image_features_list.append(image_features)
+        while i <= 400:
+            image_features=get_image_features(data_path + '/'+ dataset + '/'+ img )
+            image_features_list.append(image_features)
+            i = i + 1
     
     
 image_features_arr=np.asarray(image_features_list)

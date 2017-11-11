@@ -19,13 +19,16 @@ data_path = PATH + '/data'
 data_dir_list = os.listdir(data_path)
 
 img_data=[]
+i = 1
 for dataset in data_dir_list:
     img_list=os.listdir(data_path+'/'+ dataset)
     print ('Loaded the images of dataset-'+'{}\n'.format(dataset))
     for img in img_list:
-        input_img=cv2.imread(data_path + '/'+ dataset + '/'+ img )
-        input_img_resize=cv2.resize(input_img,(224,224))
-        img_data.append(input_img_resize)
+        while i <= 400:
+            input_img=cv2.imread(data_path + '/'+ dataset + '/'+ img )
+            input_img_resize=cv2.resize(input_img,(224,224))
+            img_data.append(input_img_resize)
+            i = i+1
     
                 
 img_data = np.array(img_data)
@@ -36,6 +39,7 @@ feature_vectors = np.loadtxt('feature_vectors_400_samples.txt')
 print ("feature_vectors_shape:",feature_vectors.shape)
 print ("num of images:",feature_vectors.shape[0])
 print ("size of individual feature vector:",feature_vectors.shape[1])
+print (img_data.shape)
 
 num_of_samples=feature_vectors.shape[0]
 num_of_samples_each_class = 100
