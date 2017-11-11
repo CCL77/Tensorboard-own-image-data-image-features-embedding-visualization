@@ -57,7 +57,7 @@ names = ['noName']
 #    for row in range(210):
 #        c = y[row]
 #        metadata_file.write('{}\n'.format(c))
-metadata_file = open(os.path.join(LOG_DIR, 'metadata_4_classes.tsv'), 'w')
+metadata_file = open(os.path.join(LOG_DIR, 'metadata_classes.tsv'), 'w')
 metadata_file.write('Class\tName\n')
 k=100 # num of samples in each class
 j=0
@@ -105,7 +105,7 @@ def images_to_sprite(data):
     return data
 #%%
 sprite = images_to_sprite(img_data)
-cv2.imwrite(os.path.join(LOG_DIR, 'sprite_4_classes.png'), sprite)
+cv2.imwrite(os.path.join(LOG_DIR, 'sprite_classes.png'), sprite)
 #scipy.misc.imsave(os.path.join(LOG_DIR, 'sprite.png'), sprite)
 
 #%%
@@ -113,16 +113,16 @@ with tf.Session() as sess:
     saver = tf.train.Saver([features])
 
     sess.run(features.initializer)
-    saver.save(sess, os.path.join(LOG_DIR, 'images_4_classes.ckpt'))
+    saver.save(sess, os.path.join(LOG_DIR, 'images_classes.ckpt'))
     
     config = projector.ProjectorConfig()
     # One can add multiple embeddings.
     embedding = config.embeddings.add()
     embedding.tensor_name = features.name
     # Link this tensor to its metadata file (e.g. labels).
-    embedding.metadata_path = os.path.join(LOG_DIR, 'metadata_4_classes.tsv')
+    embedding.metadata_path = os.path.join(LOG_DIR, 'metadata_classes.tsv')
     # Comment out if you don't want sprites
-    embedding.sprite.image_path = os.path.join(LOG_DIR, 'sprite_4_classes.png')
+    embedding.sprite.image_path = os.path.join(LOG_DIR, 'sprite_classes.png')
     embedding.sprite.single_image_dim.extend([img_data.shape[1], img_data.shape[1]])
     # Saves a config file that TensorBoard will read during startup.
     projector.visualize_embeddings(tf.summary.FileWriter(LOG_DIR), config)
